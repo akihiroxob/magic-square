@@ -1,0 +1,225 @@
+:root {
+  --bg: #f2f4f8;
+  --primary: #1d4ed8;
+  --accent: #f97316;
+  --text: #1f2937;
+  --grid-border: #111827;
+  --hint-bg: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Zen Kaku Gothic New', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.9), rgba(249, 115, 22, 0.85));
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.2);
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 4vw, 3.1rem);
+  margin-bottom: 0.5rem;
+}
+
+.hero p {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+main {
+  width: min(960px, 92vw);
+  margin: 0 auto;
+  flex: 1;
+  padding: 2rem 0 4rem;
+}
+
+section + section {
+  margin-top: 2.5rem;
+}
+
+.instructions ol {
+  padding-left: 1.2rem;
+}
+
+.instructions li {
+  margin: 0.4rem 0;
+}
+
+.note {
+  margin-top: 1rem;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+.board-section {
+  display: grid;
+  gap: 1.5rem;
+  justify-items: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 0;
+  border: 4px solid var(--grid-border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.15);
+}
+
+.cell {
+  position: relative;
+  width: min(30vw, 160px);
+  aspect-ratio: 1 / 1;
+  border: 2px solid var(--grid-border);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.cell.hint {
+  background: var(--hint-bg);
+  font-size: clamp(2.8rem, 8vw, 3.4rem);
+  font-weight: 700;
+  color: var(--grid-border);
+}
+
+.cell canvas {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  touch-action: none;
+  border-radius: 12px;
+}
+
+.cell-controls {
+  position: absolute;
+  inset: 8px;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.recognized-value {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 600;
+  color: var(--primary);
+  pointer-events: auto;
+}
+
+.manual-input {
+  align-self: flex-end;
+  display: flex;
+  gap: 0.4rem;
+  pointer-events: auto;
+}
+
+.manual-input input {
+  width: 3ch;
+  padding: 0.2rem 0.4rem;
+  font-size: 1.1rem;
+  text-align: center;
+  border: 1px solid #cbd5f5;
+  border-radius: 6px;
+}
+
+.manual-input button {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.manual-input button:hover,
+.manual-input button:focus {
+  background: #fb923c;
+}
+
+.board-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.board-actions button {
+  padding: 0.8rem 1.6rem;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(29, 78, 216, 0.25);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.board-actions button:hover,
+.board-actions button:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(29, 78, 216, 0.3);
+}
+
+.board-actions button:nth-child(2) {
+  background: #475569;
+  box-shadow: 0 8px 18px rgba(71, 85, 105, 0.25);
+}
+
+.board-actions button:nth-child(2):hover,
+.board-actions button:nth-child(2):focus {
+  box-shadow: 0 12px 24px rgba(71, 85, 105, 0.3);
+}
+
+#statusMessage {
+  min-height: 1.6rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+#statusMessage.error {
+  color: #dc2626;
+}
+
+.about p {
+  line-height: 1.7;
+}
+
+footer {
+  text-align: center;
+  padding: 1.5rem 0 2rem;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+@media (max-width: 640px) {
+  .board {
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+  }
+
+  .cell {
+    width: min(32vw, 140px);
+  }
+}
