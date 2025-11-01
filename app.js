@@ -1,20 +1,73 @@
-const initialLayout = [
+const MAGIC_SQUARES = [
   [
-    { value: 8, locked: true },
-    { value: null, locked: false },
-    { value: 6, locked: true }
+    [8, 1, 6],
+    [3, 5, 7],
+    [4, 9, 2]
   ],
   [
-    { value: null, locked: false },
-    { value: 5, locked: true },
-    { value: null, locked: false }
+    [6, 7, 2],
+    [1, 5, 9],
+    [8, 3, 4]
   ],
   [
-    { value: 4, locked: true },
-    { value: null, locked: false },
-    { value: null, locked: false }
+    [2, 9, 4],
+    [7, 5, 3],
+    [6, 1, 8]
+  ],
+  [
+    [4, 3, 8],
+    [9, 5, 1],
+    [2, 7, 6]
+  ],
+  [
+    [6, 1, 8],
+    [7, 5, 3],
+    [2, 9, 4]
+  ],
+  [
+    [8, 3, 4],
+    [1, 5, 9],
+    [6, 7, 2]
+  ],
+  [
+    [4, 9, 2],
+    [3, 5, 7],
+    [8, 1, 6]
+  ],
+  [
+    [2, 7, 6],
+    [9, 5, 1],
+    [4, 3, 8]
   ]
 ];
+
+const LOCKED_MASK = [
+  [true, false, true],
+  [false, true, false],
+  [true, false, false]
+];
+
+let lastMagicSquareIndex = null;
+
+function generateLayout() {
+  let index = Math.floor(Math.random() * MAGIC_SQUARES.length);
+  if (MAGIC_SQUARES.length > 1) {
+    while (index === lastMagicSquareIndex) {
+      index = Math.floor(Math.random() * MAGIC_SQUARES.length);
+    }
+  }
+  lastMagicSquareIndex = index;
+
+  const magicSquare = MAGIC_SQUARES[index];
+  return magicSquare.map((row, rowIndex) =>
+    row.map((value, colIndex) => ({
+      value: LOCKED_MASK[rowIndex][colIndex] ? value : null,
+      locked: LOCKED_MASK[rowIndex][colIndex]
+    }))
+  );
+}
+
+let currentLayout = generateLayout();
 
 const boardElement = document.querySelector('.board');
 const statusMessage = document.getElementById('statusMessage');
@@ -37,7 +90,7 @@ function createBoard() {
   boardElement.innerHTML = '';
   cellState.length = 0;
 
-  initialLayout.forEach((rowConfig, rowIndex) => {
+  currentLayout.forEach((rowConfig, rowIndex) => {
     const rowState = [];
     rowConfig.forEach((cellConfig, colIndex) => {
       const cellElement = document.createElement('div');
@@ -369,11 +422,19 @@ function showStatus(message, isError = false) {
 }
 
 function resetBoard() {
+  currentLayout = generateLayout();
+
   cellState.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
-      if (cell.locked) return;
+      const layoutCell = currentLayout[rowIndex][colIndex];
+      if (cell.locked) {
+        cell.value = layoutCell.value;
+        cell.element.textContent = String(layoutCell.value);
+        return;
+      }
+
       clearCell(cell);
-      const initialValue = initialLayout[rowIndex][colIndex].value;
+      const initialValue = layoutCell.value;
       if (initialValue) {
         setCellValue(cell, initialValue, 'reset');
         if (cell.input) {
@@ -382,7 +443,7 @@ function resetBoard() {
       }
     });
   });
-  showStatus('ボードをリセットしました。');
+  showStatus('ヒントの数字を入れ替えました。');
 }
 
 checkButton.addEventListener('click', checkMagicSquare);
