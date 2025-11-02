@@ -346,13 +346,72 @@ async function recognizeDigit(cellInfo) {
 }
 
 function canvasToTensor(canvas) {
+  const sourceCtx = canvas.getContext('2d');
+  const { width, height } = canvas;
+  const sourceData = sourceCtx.getImageData(0, 0, width, height);
+  const pixels = sourceData.data;
+
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+  const threshold = 245;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const index = (y * width + x) * 4;
+      const r = pixels[index];
+      const g = pixels[index + 1];
+      const b = pixels[index + 2];
+      const grayscale = (r + g + b) / 3;
+      if (grayscale < threshold) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
   const tmpCanvas = document.createElement('canvas');
   tmpCanvas.width = 28;
   tmpCanvas.height = 28;
   const tmpCtx = tmpCanvas.getContext('2d');
   tmpCtx.fillStyle = '#ffffff';
   tmpCtx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-  tmpCtx.drawImage(canvas, 0, 0, tmpCanvas.width, tmpCanvas.height);
+  tmpCtx.imageSmoothingEnabled = true;
+  tmpCtx.imageSmoothingQuality = 'high';
+
+  if (maxX >= minX && maxY >= minY) {
+    const padding = Math.round(Math.max(maxX - minX, maxY - minY) * 0.15);
+    minX = Math.max(0, minX - padding);
+    minY = Math.max(0, minY - padding);
+    maxX = Math.min(width - 1, maxX + padding);
+    maxY = Math.min(height - 1, maxY + padding);
+
+    const drawnWidth = Math.max(1, maxX - minX + 1);
+    const drawnHeight = Math.max(1, maxY - minY + 1);
+    const scale = Math.min(20 / drawnWidth, 20 / drawnHeight);
+    const scaledWidth = Math.max(1, Math.round(drawnWidth * scale));
+    const scaledHeight = Math.max(1, Math.round(drawnHeight * scale));
+    const dx = Math.round((28 - scaledWidth) / 2);
+    const dy = Math.round((28 - scaledHeight) / 2);
+
+    tmpCtx.drawImage(
+      canvas,
+      minX,
+      minY,
+      drawnWidth,
+      drawnHeight,
+      dx,
+      dy,
+      scaledWidth,
+      scaledHeight
+    );
+  } else {
+    tmpCtx.drawImage(canvas, 0, 0, tmpCanvas.width, tmpCanvas.height);
+  }
+
   const { data } = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height);
   const buffer = new Float32Array(28 * 28);
   for (let i = 0; i < data.length; i += 4) {
